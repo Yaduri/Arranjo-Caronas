@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Car, Calendar, Users, Settings, Menu, X } from "lucide-react";
+import { Car, Calendar, Users, Settings, Menu, X, LogOut } from "lucide-react";
+import { logout } from "@/app/actions";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,12 +15,12 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md print:hidden">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <Car className="h-6 w-6 text-blue-600" />
           <span className="text-xl font-bold tracking-tight text-slate-900">
-            Arranjo Caronas
+            Caronas
           </span>
         </div>
         
@@ -41,6 +42,16 @@ export function Header() {
           <div className="hidden sm:flex h-8 w-8 rounded-full bg-blue-100 items-center justify-center text-blue-700 font-bold text-xs">
             YC
           </div>
+          
+          <form action={logout} className="hidden md:block">
+            <button 
+              type="submit" 
+              className="p-2 text-slate-500 hover:text-red-600 hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center"
+              title="Sair"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </form>
           
           {/* Mobile Menu Button */}
           <button 
@@ -67,6 +78,15 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
+            <form action={logout} className="w-full">
+              <button 
+                type="submit"
+                className="w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-all font-semibold text-left"
+              >
+                <LogOut className="h-5 w-5" />
+                Sair
+              </button>
+            </form>
           </nav>
         </div>
       )}

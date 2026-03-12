@@ -4,6 +4,8 @@ import { RideCard } from "@/components/arrangement/RideCard";
 import { ArrangementBuilder } from "@/components/arrangement/ArrangementBuilder";
 import { Calendar, Info, Plus, ChevronRight } from "lucide-react";
 import { AttendanceConfirmation } from "@/components/notifications/AttendanceConfirmation";
+import { PrintButton } from "@/components/ui/PrintButton";
+import { DEFAULT_DRIVER_TEMPLATE, DEFAULT_PASSENGER_TEMPLATE } from "@/lib/utils";
 
 export default async function Home() {
   const participants = await prisma.participant.findMany();
@@ -32,6 +34,15 @@ export default async function Home() {
     },
   });
 
+  const configs = await prisma.appSetting.findMany();
+  const configMap: Record<string, string> = {};
+  configs.forEach((c: { key: string; value: string }) => {
+    configMap[c.key] = c.value;
+  });
+
+  const driverTemplate = configMap.driver_message_template || DEFAULT_DRIVER_TEMPLATE;
+  const passengerTemplate = configMap.passenger_message_template || DEFAULT_PASSENGER_TEMPLATE;
+
   // Group rides by date for better visualization
   const groupedRides = rides.reduce((acc: any, ride) => {
     const d = new Date(ride.date).toDateString();
@@ -41,25 +52,27 @@ export default async function Home() {
   }, {});
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div className="max-w-xl">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-4">
             Agenda de Caronas
           </h1>
-          <p className="text-slate-500 font-semibold text-lg leading-relaxed">
+          <p className="text-slate-500 font-semibold text-lg leading-relaxed print:hidden print-hide">
             Bem-vindo ao seu painel de planejamento. Gerencie os próximos arranjos abaixo.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 print:hidden">
+          <PrintButton />
+          <div className="h-6 w-px bg-slate-200 hidden sm:block" />
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest sm:hidden">Confirmar presença</span>
-          <AttendanceConfirmation passengers={passengers} />
+          <AttendanceConfirmation passengers={passengers} template={passengerTemplate} driverTemplate={driverTemplate} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-12 xl:col-span-8 order-2 lg:order-1 space-y-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 print:block">
+        <div className="lg:col-span-12 xl:col-span-8 order-2 lg:order-1 space-y-12 print:space-y-6">
           {Object.keys(groupedRides).length > 0 ? (
             Object.entries(groupedRides).map(([dateStr, dayRides]: [string, any]) => (
               <section key={dateStr} className="relative pl-6 sm:pl-10 border-l-4 border-blue-50 space-y-6">
@@ -70,7 +83,7 @@ export default async function Home() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {dayRides.map((ride: any) => (
-                    <RideCard key={ride.id} ride={ride} drivers={drivers} passengers={passengers} />
+                    <RideCard key={ride.id} ride={ride} drivers={drivers} passengers={passengers} template={driverTemplate} />
                   ))}
                 </div>
               </section>
@@ -88,18 +101,18 @@ export default async function Home() {
           )}
         </div>
 
-        <div className="lg:col-span-12 xl:col-span-4 order-1 lg:order-2">
+        <div className="lg:col-span-12 xl:col-span-4 order-1 lg:order-2 print:hidden">
           <div className="sticky top-24 space-y-6">
-            <div className="bg-blue-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-100 overflow-hidden relative">
+            <div className="bg-blue-600 rounded-3xl p-6 sm:p-7 text-white shadow-xl shadow-blue-500/20 overflow-hidden relative">
               <div className="absolute top-0 right-0 h-32 w-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-              <h3 className="text-xl font-bold mb-2 flex items-center gap-2 relative z-10">
+              <h3 className="text-xl font-bold mb-1 flex items-center gap-2 relative z-10">
                 <Plus className="h-6 w-6" />
                 Novo Arranjo
               </h3>
               <p className="text-blue-100 text-sm font-medium mb-6 relative z-10">
                 Organize uma nova carona para qualquer reunião do ano.
               </p>
-              <div className="scale-[1.05] origin-top-left -mx-2 -mb-2">
+              <div className="relative z-10">
                 <ArrangementBuilder drivers={drivers} passengers={passengers} date={now} />
               </div>
             </div>

@@ -30,3 +30,8 @@ model RidePassenger {
   passenger   Participant @relation(fields: [passengerId], references: [id])
   @@id([rideId, passengerId])
 }
+
+model AppSetting {
+  key   String @id
+  value String
+}

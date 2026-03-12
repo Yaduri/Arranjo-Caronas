@@ -107,18 +107,18 @@ export function ParticipantList({ participants }: ParticipantListProps) {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2">
                   <button 
                     onClick={() => startEdit(p)}
-                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all"
+                    className="p-2.5 text-blue-600 bg-blue-50 md:text-slate-400 md:bg-transparent md:hover:text-blue-600 md:hover:bg-blue-50 rounded-full transition-all"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-5 w-5" />
                   </button>
                   <button 
                     onClick={() => handleDelete(p.id, p.name)}
-                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                    className="p-2.5 text-red-600 bg-red-50 md:text-slate-400 md:bg-transparent md:hover:text-red-500 md:hover:bg-red-50 rounded-full transition-all"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
               </>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { generateWhatsappLink, formatDate } from "@/lib/utils";
+import { generateWhatsappLink, formatDate, replaceVariables } from "@/lib/shared-utils";
 import { MessageSquare, Trash2, User, Edit, Clock } from "lucide-react";
 import { deleteRide } from "@/app/actions";
 import { ArrangementBuilder } from "./ArrangementBuilder";
@@ -10,20 +10,24 @@ interface RideCardProps {
   ride: any;
   drivers: any[];
   passengers: any[];
+  template: string;
 }
 
-export function RideCard({ ride, drivers, passengers }: RideCardProps) {
+export function RideCard({ ride, drivers, passengers, template }: RideCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   
   const rideDate = new Date(ride.date);
   const isSunday = rideDate.getDay() === 0;
   
-  const greeting = `Olá ${ride.driver.name}! Tudo bem?`;
   const dayName = rideDate.toLocaleDateString('pt-BR', { weekday: 'long' });
-  const meetingType = isSunday ? "reunião" : `reunião de ${dayName}`;
   const timeStr = rideDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  const driverMessage = `${greeting} Passando para lembrar da carona de ${dayName} às ${timeStr} para a ${meetingType}. Você leva a ${ride.passengers.map((p: any) => p.passenger.name).join(" e a ")}? Abraço!`;
+  const driverMessage = replaceVariables(template, {
+    motorista: ride.driver.name,
+    passageiras: ride.passengers.map((p: any) => p.passenger.name).join(" e a "),
+    data: dayName,
+    hora: timeStr
+  });
   
   if (isEditing) {
     return (
@@ -56,7 +60,7 @@ export function RideCard({ ride, drivers, passengers }: RideCardProps) {
           </div>
         </div>
         
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden">
           <button 
             onClick={() => setIsEditing(true)}
             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all"
@@ -86,7 +90,7 @@ export function RideCard({ ride, drivers, passengers }: RideCardProps) {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-slate-50">
+      <div className="pt-4 border-t border-slate-50 print:hidden">
         <a 
           href={generateWhatsappLink(ride.driver.phone || "999999999", driverMessage) || "#"}
           target="_blank"

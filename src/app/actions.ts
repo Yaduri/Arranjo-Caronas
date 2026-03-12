@@ -103,3 +103,47 @@ export async function deleteParticipant(id: number) {
   revalidatePath("/participantes");
   revalidatePath("/");
 }
+
+export async function getConfigurations() {
+  const configs = await prisma.appSetting.findMany();
+  const configMap: Record<string, string> = {};
+  configs.forEach((c: { key: string; value: string }) => {
+    configMap[c.key] = c.value;
+  });
+  return configMap;
+}
+
+export async function updateConfiguration(key: string, value: string) {
+  await prisma.appSetting.upsert({
+    where: { key },
+    update: { value },
+    create: { key, value },
+  });
+  revalidatePath("/configuracoes");
+}
+
+import { cookies } from "next/headers";
+
+export async function authenticate(formData: FormData) {
+  const password = formData.get("password") as string;
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+  if (password === adminPassword) {
+    (await cookies()).set("auth-token", "authenticated", { secure: true, httpOnly: true });
+    // Since we're in a server action handling a form submission, we should redirect.
+    // However, it's simpler to let Next.js handle revalidation if we just set the cookie.
+    // Let's redirect to home.
+    // Actually, redirecting from server actions requires next/navigation
+    const { redirect } = await import("next/navigation");
+    redirect("/");
+  } else {
+    // Optionally handle error, but for simplicity, we can do nothing or throw.
+    throw new Error("Invalid password");
+  }
+}
+
+export async function logout() {
+  (await cookies()).delete("auth-token");
+  const { redirect } = await import("next/navigation");
+  redirect("/login");
+}

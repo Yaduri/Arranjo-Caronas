@@ -1,17 +1,23 @@
 "use client";
 
-import { generateWhatsappLink } from "@/lib/utils";
+import { generateWhatsappLink, replaceVariables } from "@/lib/shared-utils";
 import { CheckCircle2, MessageSquare } from "lucide-react";
 
 interface AttendanceConfirmationProps {
   passengers: any[];
+  template: string;
+  driverTemplate: string;
 }
 
-export function AttendanceConfirmation({ passengers }: AttendanceConfirmationProps) {
+export function AttendanceConfirmation({ passengers, template, driverTemplate }: AttendanceConfirmationProps) {
   return (
     <div className="flex gap-2">
       {passengers.map(p => {
-        const message = `Olá irmã ${p.name}, tudo bem? Só confirmando se a senhora vai na reunião este domingo para podermos organizar a carona. 😊`;
+        const message = replaceVariables(template, {
+          passenger: p.name,
+          passageira: p.name,
+          data: "domingo" // Simplified for the direct button
+        });
         const link = generateWhatsappLink(p.phone || "999999999", message);
         
         return (

@@ -7,7 +7,17 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Arranjo de Caronas",
-  description: "Gerenciamento de caronas para o arranjo de domingo",
+  description: "Gerenciamento de caronas para as reuniões",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Caronas",
+  },
+};
+
+export const viewport = {
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -24,7 +34,7 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="border-t py-6 text-center text-sm text-slate-500">
-            &copy; {new Date().getFullYear()} Arranjo de Caronas
+            &copy; {new Date().getFullYear()} Caronas
           </footer>
         </div>
       </body>
