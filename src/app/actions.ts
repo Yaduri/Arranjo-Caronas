@@ -148,43 +148,4 @@ export async function logout() {
   redirect("/login");
 }
 
-export async function sendWhatsAppMessage(phone: string, text: string) {
-  const apiUrl = process.env.WHATSAPP_API_URL;
-  const apiKey = process.env.WHATSAPP_API_KEY;
-  const instanceName = process.env.WHATSAPP_INSTANCE_NAME || "caronas";
 
-  if (!apiUrl || !apiKey) {
-    throw new Error("WhatsApp API credentials are not configured in .env");
-  }
-
-  // Evolution API requires country code. Ensure it starts with 55 for Brazil if 11 digits
-  let formattedPhone = phone.replace(/\D/g, "");
-  if (formattedPhone.length === 11 || formattedPhone.length === 10) {
-    formattedPhone = `55${formattedPhone}`;
-  }
-
-  try {
-    const response = await fetch(`${apiUrl}/message/sendText/${instanceName}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": apiKey,
-      },
-      body: JSON.stringify({
-        number: formattedPhone,
-        text: text,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Evolution API Error:", errorData);
-      throw new Error(`Failed to send message: ${response.status}`);
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error sending WhatsApp message:", error);
-    throw new Error("Failed to send WhatsApp message");
-  }
-}

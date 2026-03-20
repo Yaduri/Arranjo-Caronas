@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { generateWhatsappLink, formatDate, replaceVariables } from "@/lib/shared-utils";
-import { MessageSquare, Trash2, User, Edit, Clock, Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { deleteRide, sendWhatsAppMessage } from "@/app/actions";
+import { MessageSquare, Trash2, User, Edit, Clock } from "lucide-react";
+import { deleteRide } from "@/app/actions";
 import { ArrangementBuilder } from "./ArrangementBuilder";
 
 interface RideCardProps {
@@ -15,12 +15,8 @@ interface RideCardProps {
 
 export function RideCard({ ride, drivers, passengers, template }: RideCardProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [sendResult, setSendResult] = useState<'success' | 'error' | null>(null);
   
   const rideDate = new Date(ride.date);
-  const isSunday = rideDate.getDay() === 0;
-  
   const dayName = rideDate.toLocaleDateString('pt-BR', { weekday: 'long' });
   const timeStr = rideDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
@@ -30,22 +26,6 @@ export function RideCard({ ride, drivers, passengers, template }: RideCardProps)
     data: dayName,
     hora: timeStr
   });
-  
-  const handleSendWhatsApp = async () => {
-    setIsSending(true);
-    setSendResult(null);
-    try {
-      await sendWhatsAppMessage(ride.driver.phone || "999999999", driverMessage);
-      setSendResult('success');
-      setTimeout(() => setSendResult(null), 3000);
-    } catch (error) {
-       console.error("Failed to send WhatsApp message via UI:", error);
-       setSendResult('error');
-       setTimeout(() => setSendResult(null), 3000);
-    } finally {
-      setIsSending(false);
-    }
-  };
 
   if (isEditing) {
     return (
@@ -109,39 +89,15 @@ export function RideCard({ ride, drivers, passengers, template }: RideCardProps)
       </div>
 
       <div className="pt-4 border-t border-slate-50 print:hidden">
-        <button 
-          onClick={handleSendWhatsApp}
-          disabled={isSending || sendResult === 'success'}
-          className={`w-full flex items-center justify-center gap-2 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg active:scale-[0.98] ${
-            sendResult === 'success' 
-              ? 'bg-emerald-500 text-white shadow-emerald-100' 
-              : sendResult === 'error'
-              ? 'bg-red-500 text-white shadow-red-100'
-              : 'bg-green-500 hover:bg-green-600 text-white shadow-green-100 hover:shadow-green-200'
-          }`}
+        <a 
+          href={generateWhatsappLink(ride.driver.phone, driverMessage) || "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-green-100 hover:shadow-green-200 active:scale-[0.98]"
         >
-          {isSending ? (
-            <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Enviando...
-            </>
-          ) : sendResult === 'success' ? (
-            <>
-              <CheckCircle2 className="h-5 w-5" />
-              Enviado automátic.!
-            </>
-          ) : sendResult === 'error' ? (
-            <>
-              <XCircle className="h-5 w-5" />
-              Falha ao Enviar
-            </>
-          ) : (
-            <>
-              <MessageSquare className="h-5 w-5" />
-              Enviar via API
-            </>
-          )}
-        </button>
+          <MessageSquare className="h-5 w-5" />
+          Enviar WhatsApp
+        </a>
       </div>
     </div>
   );
