@@ -2,15 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import webpush from "web-push";
 
-// Initialize web-push
-webpush.setVapidDetails(
-  "mailto:yago@example.com",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
-
 export async function GET(req: Request) {
   try {
+    // Initialize web-push only at runtime
+    if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+      webpush.setVapidDetails(
+        "mailto:yaduri16@gmail.com",
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+      );
+    } else {
+      console.warn("VAPID keys not set. Skipping notification initialization.");
+    }
+
     // Basic auth check for Cron-job.org (optional: secret header)
     const authHeader = req.headers.get("authorization");
     if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -44,6 +48,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "No rides today" });
     }
 
+    // @ts-ignore
     const subscriptions = await prisma.pushSubscription.findMany();
     const notifications = [];
 
@@ -70,6 +75,7 @@ export async function GET(req: Request) {
           ).catch(async (err) => {
             if (err.statusCode === 404 || err.statusCode === 410) {
               // Remove expired subscription
+              // @ts-ignore
               await prisma.pushSubscription.delete({ where: { id: sub.id } });
             }
           })

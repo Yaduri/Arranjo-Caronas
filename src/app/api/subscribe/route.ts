@@ -5,6 +5,7 @@ export async function POST(req: Request) {
   try {
     const subscription = await req.json();
 
+    // @ts-ignore
     const savedSubscription = await prisma.pushSubscription.upsert({
       where: { endpoint: subscription.endpoint },
       update: {
