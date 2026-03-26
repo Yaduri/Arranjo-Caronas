@@ -3,7 +3,6 @@ import { getNextSunday, formatDate } from "@/lib/utils";
 import { RideCard } from "@/components/arrangement/RideCard";
 import { ArrangementBuilder } from "@/components/arrangement/ArrangementBuilder";
 import { Calendar, Info, Plus, ChevronRight } from "lucide-react";
-import { AttendanceConfirmation } from "@/components/notifications/AttendanceConfirmation";
 import { PrintButton } from "@/components/ui/PrintButton";
 import { DEFAULT_DRIVER_TEMPLATE, DEFAULT_PASSENGER_TEMPLATE } from "@/lib/utils";
 
@@ -65,9 +64,6 @@ export default async function Home() {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 print:hidden">
           <PrintButton />
-          <div className="h-6 w-px bg-slate-200 hidden sm:block" />
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest sm:hidden">Confirmar presença</span>
-          <AttendanceConfirmation passengers={passengers} template={passengerTemplate} driverTemplate={driverTemplate} />
         </div>
       </div>
 
@@ -83,7 +79,7 @@ export default async function Home() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {dayRides.map((ride: any) => (
-                    <RideCard key={ride.id} ride={ride} drivers={drivers} passengers={passengers} template={driverTemplate} />
+                    <RideCard key={ride.id} ride={ride} drivers={drivers} passengers={passengers} template={driverTemplate} passengerTemplate={passengerTemplate} />
                   ))}
                 </div>
               </section>

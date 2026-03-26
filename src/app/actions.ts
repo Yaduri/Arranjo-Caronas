@@ -125,19 +125,19 @@ export async function updateConfiguration(key: string, value: string) {
 import { cookies } from "next/headers";
 
 export async function authenticate(formData: FormData) {
-  const password = formData.get("password") as string;
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  const password = (formData.get("password") as string)?.trim();
+  const adminPassword = (process.env.ADMIN_PASSWORD || "admin123").trim();
 
   if (password === adminPassword) {
-    (await cookies()).set("auth-token", "authenticated", { secure: true, httpOnly: true });
-    // Since we're in a server action handling a form submission, we should redirect.
-    // However, it's simpler to let Next.js handle revalidation if we just set the cookie.
-    // Let's redirect to home.
-    // Actually, redirecting from server actions requires next/navigation
+    (await cookies()).set("auth-token", "authenticated", { 
+      secure: process.env.NODE_ENV === "production", 
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax"
+    });
     const { redirect } = await import("next/navigation");
     redirect("/");
   } else {
-    // Optionally handle error, but for simplicity, we can do nothing or throw.
     throw new Error("Invalid password");
   }
 }

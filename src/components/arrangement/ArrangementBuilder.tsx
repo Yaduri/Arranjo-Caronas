@@ -18,7 +18,9 @@ export function ArrangementBuilder({ drivers, passengers, date, editRide, onClos
     editRide?.passengers.map((p: any) => p.passengerId.toString()) || []
   );
   const [selectedDate, setSelectedDate] = useState<string>(
-    editRide ? new Date(editRide.date).toISOString().slice(0, 16) : date.toISOString().slice(0, 16)
+    editRide 
+      ? new Date(editRide.date).toISOString().slice(0, 16) 
+      : new Date().toISOString().slice(0, 10) + "T18:00" // Default to 18:00 today
   );
 
   const togglePassenger = (id: string) => {
@@ -111,7 +113,7 @@ export function ArrangementBuilder({ drivers, passengers, date, editRide, onClos
                     <div className="h-1.5 w-1.5 rounded-full bg-white" />
                   )}
                 </div>
-                <span className="truncate">{p.name}</span>
+                <span className="leading-[1.1] text-[13px] text-left">{p.name}</span>
               </button>
             ))}
           </div>

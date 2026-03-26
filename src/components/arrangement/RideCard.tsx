@@ -11,14 +11,15 @@ interface RideCardProps {
   drivers: any[];
   passengers: any[];
   template: string;
+  passengerTemplate: string;
 }
 
-export function RideCard({ ride, drivers, passengers, template }: RideCardProps) {
+export function RideCard({ ride, drivers, passengers, template, passengerTemplate }: RideCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   
   const rideDate = new Date(ride.date);
-  const dayName = rideDate.toLocaleDateString('pt-BR', { weekday: 'long' });
-  const timeStr = rideDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const dayName = rideDate.toLocaleDateString("pt-BR", { weekday: "long", timeZone: "UTC" });
+  const timeStr = rideDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
 
   const driverMessage = replaceVariables(template, {
     motorista: ride.driver.name,
@@ -88,7 +89,7 @@ export function RideCard({ ride, drivers, passengers, template }: RideCardProps)
         </div>
       </div>
 
-      <div className="pt-4 border-t border-slate-50 print:hidden">
+      <div className="pt-4 border-t border-slate-50 print:hidden space-y-2">
         <a 
           href={generateWhatsappLink(ride.driver.phone, driverMessage) || "#"}
           target="_blank"
@@ -96,8 +97,31 @@ export function RideCard({ ride, drivers, passengers, template }: RideCardProps)
           className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-green-100 hover:shadow-green-200 active:scale-[0.98]"
         >
           <MessageSquare className="h-5 w-5" />
-          Enviar WhatsApp
+          Enviar WhatsApp (Motorista)
         </a>
+
+        {ride.passengers.map((p: any) => {
+          const pMsg = replaceVariables(passengerTemplate, {
+            passageira: p.passenger.name,
+            motorista: ride.driver.name,
+            data: dayName,
+            hora: timeStr
+          });
+          const pLink = generateWhatsappLink(p.passenger.phone, pMsg);
+
+          return (
+            <a 
+              key={p.passenger.id}
+              href={pLink || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-200 text-slate-600 hover:text-blue-600 font-bold py-3 px-4 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+            >
+              <MessageSquare className="h-4 w-4 text-emerald-500" />
+              Confirmar {p.passenger.name}
+            </a>
+          );
+        })}
       </div>
     </div>
   );
