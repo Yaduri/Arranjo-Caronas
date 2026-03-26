@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Car, Calendar, Users, Settings, Menu, X, LogOut } from "lucide-react";
 import { logout } from "@/app/actions";
+import { NotificationManager } from "@/components/notifications/NotificationManager";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +39,9 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <NotificationManager />
+          
           <div className="hidden sm:flex h-8 w-8 rounded-full bg-blue-100 items-center justify-center text-blue-700 font-bold text-xs">
             YC
           </div>

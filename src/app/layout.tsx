@@ -7,13 +7,16 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Arranjo de Caronas",
-  description: "Gerenciamento de caronas para as reuniões",
+  description: "Gerenciamento inteligente de caronas",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Caronas",
   },
+  icons: {
+    apple: "/icon-192.png",
+  }
 };
 
 export const viewport = {
@@ -37,6 +40,21 @@ export default function RootLayout({
             &copy; {new Date().getFullYear()} Caronas
           </footer>
         </div>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                  }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                  });
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

@@ -1,22 +1,38 @@
-const CACHE_NAME = 'caronas-cache-v1';
+self.addEventListener('push', function(event) {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: '1'
+      },
+      actions: [
+        {
+          action: 'explore',
+          title: 'Ver na Agenda',
+          icon: '/icon-192.png'
+        },
+        {
+          action: 'close',
+          title: 'Fechar',
+          icon: '/icon-192.png'
+        }
+      ]
+    };
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([
-        '/',
-        '/manifest.json',
-        '/icon-192x192.png',
-        '/icon-512x512.png'
-      ]);
-    })
-  );
+    event.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  }
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
-    })
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('/')
   );
 });
