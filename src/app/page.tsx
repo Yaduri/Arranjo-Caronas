@@ -4,6 +4,7 @@ import { RideCard } from "@/components/arrangement/RideCard";
 import { ArrangementBuilder } from "@/components/arrangement/ArrangementBuilder";
 import { Calendar, Info, Plus, ChevronRight } from "lucide-react";
 import { PrintButton } from "@/components/ui/PrintButton";
+import { CSVExportButton } from "@/components/ui/CSVExportButton";
 import { DEFAULT_DRIVER_TEMPLATE, DEFAULT_PASSENGER_TEMPLATE } from "@/lib/utils";
 
 export default async function Home() {
@@ -63,6 +64,8 @@ export default async function Home() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 print:hidden">
+          <CSVExportButton rides={rides} />
+          <div className="h-6 w-px bg-slate-200 hidden sm:block" />
           <PrintButton />
         </div>
       </div>
